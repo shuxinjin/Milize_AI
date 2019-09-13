@@ -1,0 +1,1527 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1,">
+<%= stylesheet_link_tag "ai_expro", media: "all" %>
+<link href="https://fonts.googleapis.com/css?family=Oswald:500" rel="stylesheet">
+<title>MILIZE PRO</title>
+
+<style>
+
+   .Kline-div{
+        position: width: 100%;height: 400px;
+       
+    }
+  .Kline-div .m-line{height: 400px;width: 30%;margin-bottom: 1px;margin-right: 1px;  } 
+  .Kline-div .K-line{height: 400px;width: 69%;margin-right: 1px;margin-right: 1px; }   
+
+  ul li{
+    list-style: none;
+    }
+   .hide{display: none}
+   .width150{
+    width: 40rem;
+    }
+   .width150 input[type="text"]{
+     width: 100%; 
+     height: 22px; 
+     border: 1px solid #ccc; 
+     border-radius: 4px; 
+     padding-left: 12px;
+   }
+    .width150 ul{ 
+      width: 96%; 
+      padding: 0 0 0 20px; 
+      margin: 0; 
+      border: 1px solid #ccc; 
+    }
+    .width150 li{ 
+      padding: 5px; 
+    }
+    .width150 li+li{ 
+      border-top: 1px solid #ccc; 
+    }
+
+
+
+</style>
+
+
+
+</head>
+
+<body class="exprob">
+
+
+
+  <div id="wrapperexpro">
+        <header class="exproh">
+      	<div id="header-inner" style="width: 100%;">
+      	
+      	
+      	<table width="100%" style="padding-top: 0.5rem;"></tr>
+         <td align="left" class="head_sch" >
+         	
+        
+		                 		
+        </td>
+        
+        <form role="search" class="navbar-form-custom" action="/equity/prediction_ranking"> 
+        	
+        <td>
+        		          <div class="width150">
+							      Financial Indicators<input type="text" id="ratios" name="ratios" placeholder="Select" readonly>
+							      <ul id="ratiosId" class="hide">
+							      </ul>
+						  </div>
+        
+        </td>
+		<td style="width: 200px;">
+		                			      
+           <input type="number"  placeholder="" name="tick_code" min="1" max="9999" onkeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))" oninput="if(value.length>4) value=value.slice(0,4)" style="width:90px; padding:1px 1px; maxlength:4;">
+           <input name="" type="submit" class="btn btn-warning" style="width:80px;text-align: center;padding:1px 1px;" value="銘柄検索" /> 
+                 
+		</td>
+		 </form> 
+		<td align="right" style="padding-right: 3px;width: 70px;">
+		    <span class="txt" style="display:inline-block; padding-top:0.5rem;"><p>予測間隔</p></span> 
+		</td>
+		  
+		<td style="padding-right: 3px;width: 105px;">
+		    <form action="/equity/prediction_ranking">  <select class="selectpicker" name="d" style="width:100px;color:black;" onchange="this.form.submit()">
+		                        <% @rkdate.each do |key,value| %>
+		                          <% if key == params[:d] then%>
+		                            <option selected="selected" value="<%= key %>"><font color="blue"><%= value %> </font></option>
+		                          <% else %>
+		                            <option value="<%= key %>"> <font color="blue"> <%= value %> </font> </option>
+		                          <% end%>
+		                        <% end%>
+		                      </select>
+		                      
+		                      
+		                      <% @rkdate.each do |key,value| %>
+		                        <% if key == params[:d] then%>
+		                         
+		                          <input type="hidden" name="rankd" id="rankd" value="<%= @selecttopix %>"/>
+		                   
+		                        <% end%>
+		                      <% end%>
+		                                  
+		     </form>
+		                  
+		</td>
+		  
+		 <td align="right" style="padding-right: 3px;width: 115px;">
+		  	
+		  	          <span class="txt" style="display:inline-block;  padding-top:0.5rem;"><p>構成銘柄の指数</p></span>
+		</td>
+		 
+		<td style="width: 110px;">
+		               <form action="/equity/prediction_ranking">  <select name="rankd"  class="selectpicker" style="width:100px;color:black;" onchange="this.form.submit()">
+		                        <option  <% if @selecttopix=="topix" then %> selected="selected" <% end %> value="topix"><font color="blue">TOPIX1000</font></option>
+		                        <option  <% if @selecttopix=="nikkei" then %> selected="selected" <% end %>  value="nikkei"><font color="blue">Nikkei225</font></option>
+		        
+		                        </select> 
+		                     <% @rkdate.each do |key,value| %>
+		                        <% if key == params[:d] then%>
+		                          <input type="hidden" name="d" id="d" value="<%= key %>"/>
+		                        <% end%>
+		                      <% end%>
+		                </form>
+		
+		
+		
+		 </td>
+		  <td style="width: 25%"><div id="date"></div></td>
+		 </tr></table>
+
+		</div>
+
+       </header>
+
+
+
+    <main class="expromain">
+      <div id="main-inner">
+        <div class="c1 blockexpro">
+          <div class="heading-1">
+            <h2 class="exproh2"> abc:<%= @testj.to_json.html_safe %>,  直近の株価予測</h2>
+            <div class="h2-en">STOCK PRICE FORECAST</div>
+          </div>
+
+          <div class="c1 c2">
+            <h3 class="exproh3"> <%= @tickern %> <span>直近・予測株価</span></h3>
+        
+            <div class="c1">
+
+	           <div id="Kline-div" class="Kline-div">  
+	              <div id="k-content" class="K-line" style="float:left;padding:0 1px;z-index:1;"></div> 
+	                        <div id="m-line" class="m-line" style="float:left;padding:0 1px;position: none;z-index:1;" ></div>
+	           </div> 
+            
+           </div>
+          </div>
+
+          <div class="c1 c2">
+            <h3 class="exproh3">統計</h3>
+
+            <div id="statistics">
+              <div class="column3 buy" style="width:35%;">
+                <div class="ttl">買い</div>
+                <div class="content">
+                  
+                  <div class="num"> <%= @predictTrend["up"] %> <span>銘柄<span></div>         
+                  <div class="percent"> <%= @predictTrend["uprate"] %>% </div>
+
+                </div>
+              </div>
+              <div class="column3 neutral" style="width:30%;">
+              	
+                <div class="ttl">ニュートラル</div>
+                <div class="content">
+                  <div class="num"> <%= @predictTrend["same"] %> <span>銘柄</span></div>
+                  <div class="percent"> <%= @predictTrend["samerate"] %>% </div>
+                </div>
+                
+              </div>
+              
+              <div class="column3 sell" style="width:35%;">
+                <div class="ttl">売り</div>
+                <div class="content">
+                  <div class="num"> <%= @predictTrend["down"] %> <span>銘柄</span></div>
+                  <div class="percent"> <%= @predictTrend["downrate"] %>% </div>
+                </div>
+              </div>
+            </div>
+            <div id="today-buy-sell">
+              <div class="buy" style="width:100%;">
+                <div class="ttl">今日の買い銘柄</div>
+                <div class="content"><ul>
+                	<li><div class="stock-num-name"><div class="num"><a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[0]["market_ticker_code"] %>"><%= @prediction_top10_u[0]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[0]["market_ticker_code"] %>"><%= @prediction_top10_u[0]["mkt_ticker_name"] %></a></div></div></li>
+                  	<li><div class="stock-num-name"><div class="num"><a class="expro"   href="/equity/strategylist?t=<%= @prediction_top10_u[1]["market_ticker_code"] %>"><%= @prediction_top10_u[1]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[1]["market_ticker_code"] %>"><%= @prediction_top10_u[1]["mkt_ticker_name"] %></a> </div></div></li>
+                    <li><div class="stock-num-name"><div class="num"><a class="expro"   href="/equity/strategylist?t=<%= @prediction_top10_u[2]["market_ticker_code"] %>"><%= @prediction_top10_u[2]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[2]["market_ticker_code"] %>"><%= @prediction_top10_u[2]["mkt_ticker_name"] %></a> </div></div></li>
+                    <li><div class="stock-num-name"><div class="num"><a class="expro"   href="/equity/strategylist?t=<%= @prediction_top10_u[3]["market_ticker_code"] %>"><%= @prediction_top10_u[3]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[3]["market_ticker_code"] %>"><%= @prediction_top10_u[3]["mkt_ticker_name"] %></a> </div></div></li>
+                    <li><div class="stock-num-name"><div class="num"><a class="expro"   href="/equity/strategylist?t=<%= @prediction_top10_u[4]["market_ticker_code"] %>"><%= @prediction_top10_u[4]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[4]["market_ticker_code"] %>"><%= @prediction_top10_u[4]["mkt_ticker_name"] %></a> </div></div></li>
+                    <li><div class="stock-num-name"><div class="num"><a class="expro"   href="/equity/strategylist?t=<%= @prediction_top10_u[5]["market_ticker_code"] %>"><%= @prediction_top10_u[5]["market_ticker_code"] %></a> </div><div class="name">  <a class="expro"  class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_u[5]["market_ticker_code"] %>"><%= @prediction_top10_u[5]["mkt_ticker_name"] %></a> </div></div></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="sell" style="width:100%;">
+                <div class="ttl">今日の売り銘柄</div>
+                <div class="content">
+                  <ul>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[0]["market_ticker_code"] %>"><%= @prediction_top10_d[0]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[0]["market_ticker_code"] %>"><%= @prediction_top10_d[0]["mkt_ticker_name"] %></a></div></div></li>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[1]["market_ticker_code"] %>"><%= @prediction_top10_d[1]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[1]["market_ticker_code"] %>"><%= @prediction_top10_d[1]["mkt_ticker_name"] %></a></div></div></li>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[2]["market_ticker_code"] %>"><%= @prediction_top10_d[2]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[2]["market_ticker_code"] %>"><%= @prediction_top10_d[2]["mkt_ticker_name"] %></a></div></div></li>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[3]["market_ticker_code"] %>"><%= @prediction_top10_d[3]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[3]["market_ticker_code"] %>"><%= @prediction_top10_d[3]["mkt_ticker_name"] %></a></div></div></li>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[4]["market_ticker_code"] %>"><%= @prediction_top10_d[4]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[4]["market_ticker_code"] %>"><%= @prediction_top10_d[4]["mkt_ticker_name"] %></a></div></div></li>
+                    <li><div class="stock-num-name"><div class="num"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[5]["market_ticker_code"] %>"><%= @prediction_top10_d[5]["market_ticker_code"] %></a> </div> <div class="name"> <a class="expro"  href="/equity/strategylist?t=<%= @prediction_top10_d[5]["market_ticker_code"] %>"><%= @prediction_top10_d[5]["mkt_ticker_name"] %></a></div></div></li>
+                  </ul>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="c1 blockexpro">
+          <div class="heading-1">
+            <h2 class="exproh2">トレンドシグナル分布</h2>
+            <div class="h2-en">TREND SIGNAL</div>
+          </div>
+          <div class="c1 c2">
+            <h3 class="exproh3">トレンドシグナル分布推移グラフ</h3>
+            <div class="c1" style="z-index:-1;">
+               <div id="in1" style="z-index:-11;">
+               <%= high_chart("ai_prediction_trend_signal_graph", @trend_signal_graph) %>
+               
+               </div> 
+            </div>
+          </div>
+          
+            <div class="c1 c2">
+            <h3 class="exproh3">予想実績</h3>
+            <div id="predict" class="c1">
+            	
+              <table>
+                <% @prediction_hit.each_with_index do |d,idx| %>
+                <tr>
+                        
+	            <th style="width:10%;">予測統計</th>
+		        <th colspan="4" style="padding-left:2.5rem;">
+                      	 <% if params[:d] == "1" then %> 
+                      	 	<font style="font-weight:bold;color: rgb(191,192,8);">1日目</font>
+                      	 <% else %>
+                             1日目
+                         <% end %>
+                <span> (<%= d["mkt_date_1day"][5, 2] %> /  <%= d["mkt_date_1day"][8, 2] %>) </span></th>
+		        <th colspan="4" style="padding-left:2.5rem;">
+		        	     <% if params[:d] == "5" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);"> 5日目</font>
+                      	 <% else %>
+                             5日目
+                         <% end %>
+                <span> (<%= d["mkt_date_5day"][5, 2] %> /  <%= d["mkt_date_5day"][8, 2] %>) </span></th>
+		        <th colspan="4" style="padding-left:2.5rem;">
+		                 <% if params[:d] == "10" then %> 
+                      	 	<font style="font-weight:bold;color: rgb(191,192,8);">10日目 </font>
+                      	 <% else %>
+                             10日目
+                         <% end %>
+		        <span>(<%= d["mkt_date_10day"][5, 2] %> / <%= d["mkt_date_10day"][8, 2] %>) </span></th>
+                  
+                </tr>
+
+                <tr>
+                  <th>直近</th>
+                  <td>0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                  <td class="divider">0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                  <td class="divider">0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                </tr>
+
+
+                <tr>
+                 
+                 <th class="up">上がる</th>
+                   
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_1day_up_0_3"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_1day_up_3_5"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_1day_up_5_"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td rowspan="2">
+                    <%= number_to_percentage(d["hit_rate_1day_1p"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up divider">
+                    <%= number_to_percentage(d["hit_rate_5day_up_0_3"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_5day_up_3_5"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_5day_up_5_"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td rowspan="2">
+                    <%= number_to_percentage(d["hit_rate_5day_1p"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up divider">
+                    <%= number_to_percentage(d["hit_rate_10day_up_0_3"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_10day_up_3_5"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_10day_up_5_"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td rowspan="2">
+                    <%= number_to_percentage(d["hit_rate_10day_1p"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  
+                  
+                </tr>
+
+                <tr>
+ 
+                <th class="down">下がる</th>
+			          <td class="down divider">
+			            <%= number_to_percentage(d["hit_rate_1day_down_0_3"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			          <td class="down">
+			            <%= number_to_percentage(d["hit_rate_1day_down_3_5"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			          <td class="down">
+			            <%= number_to_percentage(d["hit_rate_1day_down_5_"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			           <td class="down divider">
+			            <%= number_to_percentage(d["hit_rate_5day_down_0_3"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			        <td class="down">
+			            <%= number_to_percentage(d["hit_rate_5day_down_3_5"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			          <td class="down">
+			            <%= number_to_percentage(d["hit_rate_5day_down_5_"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			        <td class="down">
+			            <%= number_to_percentage(d["hit_rate_10day_down_0_3"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			        <td class="down">
+			            <%= number_to_percentage(d["hit_rate_10day_down_3_5"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+			        <td class="down">
+			            <%= number_to_percentage(d["hit_rate_10day_down_5_"].to_f * 100, unit: '', precision: 0) %>
+			          </td>
+          
+                </tr>
+
+                <tr>
+                  <th>累積</th>
+                  <td>0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                  <td class="divider">0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                  <td class="divider">0〜3%</td>
+                  <td>3〜5%</td>
+                  <td>5%〜</td>
+                  <td>±1%</td>
+                </tr>
+
+                <tr>
+       
+                  <th class="up">上がる</td>
+                  
+                  <td class="up divider">
+                    <%= number_to_percentage(d["hit_rate_1day_up_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_1day_up_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_1day_up_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                   <td rowspan="2" class="last-rowspan">
+                    <%= number_to_percentage(d["hit_rate_1day_1p_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                   <td class="up divider">
+                    <%= number_to_percentage(d["hit_rate_5day_up_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_5day_up_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_5day_up_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td rowspan="2"class="last-rowspan">
+                    <%= number_to_percentage(d["hit_rate_5day_1p_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  
+                  <td class="up divider">
+                    <%= number_to_percentage(d["hit_rate_10day_up_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_10day_up_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="up">
+                    <%= number_to_percentage(d["hit_rate_10day_up_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="td_data" rowspan="2">
+                    <%= number_to_percentage(d["hit_rate_10day_1p_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+  
+                  
+                  
+                </tr>
+
+                <tr>
+ 
+                  <th class="down">下がる</th>
+                  
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_1day_down_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_1day_down_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_1day_down_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_5day_down_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_5day_down_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_5day_down_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_10day_down_0_3_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_10day_down_3_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                  <td class="down">
+                    <%= number_to_percentage(d["hit_rate_10day_down_5_total"].to_f * 100, unit: '', precision: 0) %>
+                  </td>
+                                                                          
+                </tr>
+                <% end %>
+                
+              </table>
+              
+              
+            </div>
+          </div>
+        </div>
+        <div class="c1 blockexpro">
+          <div class="heading-1">
+            <h2 class="exproh2">買い・売りランキング</h2>
+            <div class="h2-en">TOP 10 BUY / SELL</div>
+          </div>
+          <div id="tab-buy-sell">
+            <input type="radio" name="tab-buy-sell" id="tab1_1" aria-controls="first_tab01" checked  onclick="disappear();" >
+            <label for="tab1_1" class="buy">買い<span>/ トップ10</span></label>
+            
+            <input type="radio" name="tab-buy-sell" id="tab1_2" aria-controls="second_tab01"   onclick="disappear();" >
+            
+            <label for="tab1_2" class="sell">売り<span>/ トップ10</span></label>
+            
+            <div class="tab-buy-sell-content">
+              <div id="tab-buy" class="tabpanel">
+                <div class="c1">
+                  <div class="top10-list">
+                    
+                    <% @prediction_hit.each_with_index do |d,idx| %>
+       
+                    <div class="ttl">
+                      
+                      <div class="rank">順位</div>
+                      <div class="tickers1">銘柄<br>コード </div>
+                      <div class="tickers-name">銘柄名称 </div>
+                      
+                      <div class="last">終値 </div>
+                      <div class="day1" class="tickers"> 
+                      	 <% if params[:d] == "1" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);">1日目</font>
+                      	 <% else %>
+                             1日目
+                         <% end %>
+                      	 	<span class="break"></span><span class="date">(<%= @prediction_top10_u[0]["mkt_date_1day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_1day"][8, 2] %>) </span> </div>
+                      <div class="day5" class="tickers">
+                      	 <% if params[:d] == "5" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);">5日目</font>
+                      	 <% else %>
+                             5日目
+                         <% end %>
+                      	<span class="break"></span><span class="date">(<%= @prediction_top10_u[0]["mkt_date_5day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_5day"][8, 2] %>)</span> </div>
+                      <div class="day10" class="tickers">
+                      	 <% if params[:d] == "10" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);">10日目</font>
+                      	 <% else %>
+                             10日目
+                         <% end %>
+                      	<span class="break"></span><span class="date"> (<%= @prediction_top10_u[0]["mkt_date_10day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_10day"][8, 2] %>) </span> </div>
+
+                    </div>
+
+                    <% end %>
+                    
+                    <% @prediction_top10_u.each_with_index do |d,idx| %>
+      
+                    <div class="list">
+                      
+                      <div class="rank"><span class="gold"> <%= (idx + 1) <= 3  ? (image_tag '/images/imgNo' + (idx + 1).to_s + '.png', :style => 'max-width:18px;max-height:18px;padding-right:2px') : (idx + 1) %> <span class="place">位</span></span></div>
+                      
+                      <div class="num-name"><div class="stock-num-name"><div class="num">   <a class="expro"  href="/equity/strategylist?t=<%= d["market_ticker_code"] %>"><%= d["market_ticker_code"] %></a> </div><div class="name"> <a class="expro"  href=""><a class="expro"  href="/equity/strategylist?t=<%= d["market_ticker_code"] %>"><%= d["mkt_ticker_name"] %></a> </a></div></div></div>
+                      <div class="last"> <%= number_to_currency(d["close_price_org"],unit:'',precision:0) %> </div>
+                      
+                      <div class="day1">
+                       <% if params[:d] == "1" then %>
+                        
+                              <font style="font-weight:bold;color: rgb(191,192,8);"> <%= number_to_currency(d["close_price_1day"],unit:'',precision:0) %> </font> 
+                         
+                      <% else %>
+                         
+                              <%= number_to_currency(d["close_price_1day"],unit:'',precision:0) %>
+                   
+                      <% end %>
+                      </div>
+                      
+                      <div class="day5">
+                         <% if params[:d] == "5" then %>
+                          
+                            <font style="font-weight:bold;color: rgb(191,192,8);">  <%= number_to_currency(d["close_price_5day"],unit:'',precision:0) %> </font> 
+                      
+                       <% else %>
+                      
+                              <%= number_to_currency(d["close_price_5day"],unit:'',precision:0) %>
+                         
+                       <% end %>
+                       
+                      </div>
+
+
+                      <div class="day10">
+                         <% if params[:d] == "10" then %>
+                         
+                                <font style="font-weight:bold;color: rgb(191,192,8);"> <%= number_to_currency(d["close_price_10day"],unit:'',precision:0) %> </font> 
+                        
+                        <% else %>
+                           
+                                <%= number_to_currency(d["close_price_10day"],unit:'',precision:0) %>
+                    
+                        <% end %>
+
+                       </div>
+  
+                    </div>
+                    <% end %>
+                     
+                  
+                  </div>
+                  <div class="chart" style="z-index:-1;">
+                    <%= high_chart("ai_prediction_graph_u", @ai_graph_u) %>
+                  </div>
+                  
+              <script type="text/javascript">
+		        function disappear() {
+		
+		        	
+		        	
+		        	$("[data-highcharts-chart]").each(function () {
+    var highChart = Highcharts.charts[$(this).data('highchartsChart')];
+    highChart.reflow();
+  
+});
+		     
+		        } 
+		      </script>    
+                  
+                  
+                  
+                  
+                  
+                </div>
+              </div>
+              <div id="tab-sell" class="tabpanel">
+                <div class="c1">
+                  <div class="top10-list">
+    
+                  <% @prediction_hit.each_with_index do |d,idx| %>
+       
+                    <div class="ttl">
+                      
+                      <div class="rank">順位</div>
+                      <div class="tickers1">銘柄<br>コード </div>
+                      <div class="tickers-name">銘柄名称 </div>
+              
+                      <div class="last">終値 </div>
+                      
+                     
+                      <div class="day1">
+                         <% if params[:d] == "1" then %> 
+                      	 	<font style="font-weight:bold;color: rgb(191,192,8);">1日目</font>
+                      	 <% else %>
+                             1日目
+                         <% end %>
+                      <span class="break"></span><span class="date">(<%= @prediction_top10_u[0]["mkt_date_1day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_1day"][8, 2] %>) </span> </div>
+                      <div class="day5">
+                      	
+                         <% if params[:d] == "5" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);">5日目</font>
+                      	 <% else %>
+                             5日目
+                         <% end %>
+                         
+                      <span class="break"></span><span class="date">(<%= @prediction_top10_u[0]["mkt_date_5day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_5day"][8, 2] %>)</span> </div>
+                      <div class="day10" >
+                      	 <% if params[:d] == "10" then %> 
+                      	 	 <font style="font-weight:bold;color: rgb(191,192,8);">10日目</font>
+                      	 <% else %>
+                             10日目
+                         <% end %>
+                      <span class="break"></span><span class="date"> (<%= @prediction_top10_u[0]["mkt_date_10day"][5, 2] %>/<%= @prediction_top10_u[0]["mkt_date_10day"][8, 2] %>) </span> </div>
+
+                    </div>
+
+                    <% end %>
+                    
+                    <% @prediction_top10_d.each_with_index do |d,idx| %>
+      
+                    <div class="list">
+                      
+                      <div class="rank"><span class="gold">  <%= (idx + 1) <= 3  ? (image_tag '/images/imgNo' + (idx + 1).to_s + '.png', :style => 'max-width:18px;max-height:18px;padding-right:2px') : (idx + 1) %> <span class="place">位</span></span></div>
+                      
+                      <div class="num-name"><div class="stock-num-name"><div class="num">   <a class="expro"  href="/equity/strategylist?t=<%= d["market_ticker_code"] %>"><%= d["market_ticker_code"] %></a> </div><div class="name"> <a class="expro"  href=""><a class="expro"  href="/equity/strategylist?t=<%= d["market_ticker_code"] %>"><%= d["mkt_ticker_name"] %></a> </a></div></div></div>
+                      <div class="last"> <%= number_to_currency(d["close_price_org"],unit:'',precision:0) %> </div>
+                      
+                      <div class="day1">
+                       <% if params[:d] == "1" then %>
+                        
+                           <font style="font-weight:bold;color: rgb(191,192,8);">  <%= number_to_currency(d["close_price_1day"],unit:'',precision:0) %> </font>
+                         
+                      <% else %>
+                         
+                              <%= number_to_currency(d["close_price_1day"],unit:'',precision:0) %>
+                   
+                      <% end %>
+                      </div>
+                      
+                      <div class="day5">
+                         <% if params[:d] == "5" then %>
+                          
+                             <font style="font-weight:bold;color: rgb(191,192,8);">  <%= number_to_currency(d["close_price_5day"],unit:'',precision:0) %> </font>
+                      
+                       <% else %>
+                      
+                              <%= number_to_currency(d["close_price_5day"],unit:'',precision:0) %>
+                         
+                       <% end %>
+                       
+                      </div>
+
+
+                      <div class="day10">
+                         <% if params[:d] == "10" then %>
+                         
+                                <font style="font-weight:bold;color: rgb(191,192,8);"> <%= number_to_currency(d["close_price_10day"],unit:'',precision:0) %> </font>
+                        
+                        <% else %>
+                           
+                                <%= number_to_currency(d["close_price_10day"],unit:'',precision:0) %>
+                    
+                        <% end %>
+
+                       </div>
+  
+                    </div>
+                    <% end %>
+                                   
+
+
+                   </div>
+                  <div class="chart" style="width: 100%">
+           
+                     <%= high_chart("ai_prediction_graph_d", @ai_graph_d) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+ 
+  
+  
+          <%= javascript_include_tag "echart/echarts.min" %>
+        <%= javascript_include_tag "echart/jquery-3.3.1.min" %>
+
+        <script type="text/javascript">
+
+          var myChart = echarts.init(document.getElementById('m-line'));
+          
+        
+          
+          var kChart = echarts.init(document.getElementById('k-content'));
+
+          window.onresize = function () 
+          {
+              myChart.resize();
+              
+        
+              kChart.resize();
+          };
+          myChart.resize();
+     
+         
+          kChart.clear();
+
+        var mChart = echarts.init(document.getElementById('m-line'));
+        mChart.setOption(initMOption(mdata,'us'));
+
+      
+        
+        var kChart = echarts.init(document.getElementById('k-content')); 
+        kChart.setOption(initKOption(kdata)); 
+        
+    
+      </script>
+
+
+
+ 
+<% content_for :javascript do %> 
+
+
+
+
+               
+<script type="text/javascript">
+
+//  the order for the web page:  date open close lowest highest volume close
+
+var kdata  = <%= @basic_dataj.to_json.html_safe %>;
+var tickern=  <%= @tickerj.to_json.html_safe %>;
+// close open predict data
+var mdata = { 
+    "data": 
+    <%= @pre_dataj.to_json.html_safe %>,　
+    "yestclose": [[<%= @ylosej.to_json.html_safe %>]]
+};
+
+
+
+var bgColor = "#1f212d";//
+var upColor="#e86b45";
+var downColor="#669ae8";
+
+// ma  
+var ma5Color = "#68c4e6";var ma10Color = "#bb59af";var ma20Color = "#d1ac4b";var ma30Color = "#419f3a";
+
+
+var get_m_data = function(m_data,type) {
+  var priceArr = new Array();  var avgPrice = new Array();  var vol = new Array();
+  var times = new Array();  $.each(m_data.data, function(i, v) {
+    priceArr.push(v[1]);
+    avgPrice.push(v[2]);
+    vol.push(v[3]); 
+    times.push(v[0]); 
+  })
+  return {
+    priceArr: priceArr,
+    avgPrice: avgPrice,
+    vol: vol,
+    times: times
+  }
+}
+
+
+
+//========================================== option
+
+/**
+
+ */
+function initMOption(m_data,type){
+  var m_datas = get_m_data(m_data,type); 
+  return {
+    tooltip: { 
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross'
+      },
+      formatter: function(params, ticket, callback) {
+        var i = params[0].dataIndex;
+  
+        var color;
+        if (m_datas.priceArr[i] > m_data.yestclose) {
+        color ='style="color:#e86b45"';
+        } else {
+          color ='style="color:#669ae8"'; 
+        }
+        
+        var html = '<div class="commColor" style="width:100px;"><div><span  '+color+' >' + m_datas.priceArr[i] + '</span></div>';
+        
+        html += '<div> </div>';        html += '</div>';        return html;
+      }
+    },
+    legend: {
+      icon: 'rect',      type: 'scroll',      itemWidth: 14,      itemHeight: 2,
+      left: 0,      top: '-1%',
+      textStyle: {
+        fontSize: 12,
+        color: '#0e99e2'
+      }
+    },
+    
+ 
+    axisPointer: {
+      show: true
+    },
+
+    color: [ma5Color, ma10Color],
+    grid: [{
+        id: 'gd1',        left: '0%',        right: '1%',        height: '60%', 
+        top: '5%'
+      },
+
+      {
+        id: 'gd2',
+        left: '0%',        right: '1%',        top: '76.5%',        height: '0%' 
+      }, 
+      {
+        left: '0%',        right: '1%',        top: '76.5%', 
+        height: '0%'
+      }
+
+    ],
+
+
+
+
+    xAxis: [ //==== x
+      { 
+        gridIndex: 0,        data: m_datas.times,        axisLabel: { //label
+          show: false
+        },
+        splitLine: {
+          show: false,
+        }
+      },
+      {
+        show:false,
+        gridIndex: 1,        data: m_datas.times,
+        axisLabel: { //label
+          show: false
+        },
+        splitLine: {
+          show: false,
+        }
+      }, { //
+        splitNumber: 2,
+        type: 'category',        gridIndex: 2,        data: m_datas.times,
+        axisLabel: { //label
+          color: '#9b9da9',
+          fontSize: 10
+        },
+      }
+    ],
+    yAxis: [ //y
+      {
+        gridIndex: 0,
+         min:<%= (@yclsl).to_json.html_safe %>,         max:<%= (@yclsh).to_json.html_safe %>,
+         
+        scale: true, 
+        splitNumber: 3,          axisLabel: { 
+          inside: true,          fontWeight:'bold',
+          
+        },z:4,splitLine: { //
+          show: false,
+          lineStyle: {
+            color: '#181a23'
+          }
+        },  
+      }, { 
+        scale: true,  gridIndex: 1, splitNumber: 3,  
+        position: 'right', z:4,        axisLabel: { //label
+          color:function(val){ 
+            if(val==m_data.yestclose){
+              return '#aaa'
+            }
+            return val>m_data.yestclose? upColor:downColor; 
+          },
+          inside: true, //label
+          fontWeight:'bold',
+          formatter:function(val){
+            var resul=ratioCalculate(val,m_data.yestclose);
+            }
+        },
+        splitLine: { 
+          show: false,          lineStyle: {
+            color: '#181a23'
+          }
+        },
+        axisPointer:{show:true,
+          label:{
+            formatter:function(params){ 
+              
+            }
+          }
+        }
+      } 
+      , { 
+        gridIndex: 2,z:4,        splitNumber: 3,
+        axisLine: {
+          onZero: false
+        },
+        axisTick: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisLabel: { 
+          color: '#c7c7c7',         inside: true,           fontSize: 8
+        },
+      }
+    ],
+  dataZoom: [{
+                    type: 'slider',
+                    xAxisIndex: [0, 1, 2], 
+                    start: 100,
+                    end: 0,
+                    throttle: 1,
+                    top: '94%',
+                    height: '6%',
+                    borderColor: '#696969',
+                    textStyle: {
+                        color: '#dcdcdc'
+                    },
+                    handleSize: '80%', //slider
+                    handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                    dataBackground: {
+                        lineStyle: {
+                            color: '#fff'
+                        }, 
+                        areaStyle: {
+                            color: '#696969'
+                        } //
+                    }
+                },
+              
+            ],
+    //animation:false,
+    backgroundColor: bgColor,    blendMode: 'source-over',
+    series: [{
+        name: '',        type: 'line',
+        data: m_datas.priceArr,        smooth: true,
+        symbol: "circle",  
+
+      color:function(val){ 
+
+                  //alert(val.data);
+                  if(val.data==m_data.yestclose){
+                    return '#aaa'
+                  }
+
+                  return val.data>=m_data.yestclose? upColor:downColor; 
+                },
+
+              lineStyle: {
+                normal: {
+                  opacity: 0.8,                  color: 'blue',                  width: 1
+                }
+              },
+
+
+
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,              color: '#4b8ea6'
+            }, {
+              offset: 0.8,              color: 'rgba(0, 136, 212, 0.02)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',            shadowBlur: 10
+          }
+        }
+      },
+      {
+        name: '',
+        type: 'line',        data: m_datas.avgPrice,        smooth: true,        symbol: "circle",
+        lineStyle: {
+          normal: {
+            opacity: 0.8,            color: '#da6ee8',            width: 1
+          }
+        }
+      },{  
+        type: 'line',         data: m_datas.priceArr,        smooth: true,        symbol: "none",
+        gridIndex: 1,        xAxisIndex: 1,        yAxisIndex: 1,
+        lineStyle: { 
+          normal: { 
+            width: 0
+          }
+        }
+      },
+  
+    ]
+  };
+}
+
+
+
+/**
+
+ */
+function ratioCalculate(price,yclose){
+  return ((price-yclose)/yclose*100).toFixed(3);
+}
+
+
+//
+function splitData(rawData) {
+  var datas = []; var times = [];var vols = [];   for (var i = 0; i < rawData.length; i++) {
+    datas.push(rawData[i]);    times.push(rawData[i].splice(0, 1)[0]);    vols.push(rawData[i][4]); 
+  }
+
+
+  return {datas:datas,times:times,vols:vols};
+}
+
+
+function calculateMA(dayCount,data) {
+  var result = [];
+  for (var i = 0, len = data.times.length; i < len; i++) {
+    if (i < dayCount) {
+      result.push('-');      continue;
+    }
+    var sum = 0;    for (var j = 0; j < dayCount; j++) {
+      sum += data.datas[i - j][1];
+    }
+    result.push((sum / dayCount).toFixed(2));
+  }
+  return result;
+}
+
+
+var calcEMA,calcDIF,calcDEA,calcMACD;
+
+
+calcEMA=function(n,data,field){
+    var i,l,ema,a;    a=2/(n+1);    if(field){
+     
+        ema=[data[0][field]];          for(i=1,l=data.length;i<l;i++){
+            ema.push((a*data[i][field]+(1-a)*ema[i-1]).toFixed(2));
+        }
+    }else{
+    
+        ema=[data[0]];
+        for(i=1,l=data.length;i<l;i++){
+            ema.push((a*data[i]+(1-a)*ema[i-1]).toFixed(3) );
+        }
+    } 
+    return ema;
+};
+
+/*
+ 
+ */
+calcDIF=function(short,long,data,field){
+    var i,l,dif,emaShort,emaLong;    dif=[];    emaShort=calcEMA(short,data,field);
+    emaLong=calcEMA(long,data,field);    for(i=0,l=data.length;i<l;i++){
+        dif.push((emaShort[i]-emaLong[i]).toFixed(3));
+    }
+    return dif;
+};
+
+
+calcDEA=function(mid,dif){
+    return calcEMA(mid,dif);
+};
+
+
+calcMACD=function(short,long,mid,data,field){
+    var i,l,dif,dea,macd,result;    result={};    macd=[];
+    dif=calcDIF(short,long,data,field);    dea=calcDEA(mid,dif);
+    for(i=0,l=data.length;i<l;i++){
+        macd.push(((dif[i]-dea[i])*2).toFixed(3));
+    }
+    result.dif=dif;    result.dea=dea;    result.macd=macd;    return result;
+};
+ 
+
+
+function initKOption(cdata){
+  var data = splitData(cdata);
+  var macd=calcMACD(12,26,9,data.datas,1);  
+  return {
+      tooltip: { 
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross'
+        }
+      },
+      legend: { 
+        icon: 'rect',         type:'scroll',        itemWidth: 14,        itemHeight: 2,
+        left: 0,        top: '-1%',          animation:true,
+        textStyle: {
+          fontSize: 12,
+          color: 'rgba(125,125,125)'
+        },
+        pageIconColor:'#0e99e2'
+      },
+      axisPointer: {
+        show: true
+      },
+      color: [ma5Color, ma10Color, ma20Color, ma30Color],
+      grid: [{
+        id: 'gd1',        left: '6.5%',        right: '1%',
+        height: '60%',        top: '5%'
+      }, {
+        left: '6.5%',        right: '1%',        top: '66.5%',
+        height: '10%' 
+      }, {
+        left: '6.5%',        right: '1%',        top: '80%',
+        height: '14%'
+      }],
+      xAxis: [ 
+        { 
+          type: 'category',          data: data.times,
+          scale: true,          boundaryGap: false,
+          axisLine: {
+            onZero: false
+          },
+          axisLabel: {            show: false          },
+          splitLine: {
+            show: false,            lineStyle: {
+              color: '#3a3a3e'
+            }
+          },
+          splitNumber: 20,          min: 'dataMin',          max: 'dataMax'
+        }, {
+          type: 'category',
+          gridIndex: 1,
+          data: data.times,
+          axisLabel: {             color: '#9b9da9',            fontSize: 10
+          },
+        }, { 
+          type: 'category',          gridIndex: 2,          data: data.times,          axisLabel: {
+            show: false
+          }
+        }
+      ],
+      yAxis: [ 
+        { 
+          scale: true,          z:4,          min:<%= @yclsl.to_json.html_safe %>,          max:<%= @yclsh.to_json.html_safe %>,
+          
+          axisLabel: {
+            color: '#c7c7c7',
+            inside: false,
+          },
+          splitLine: {
+            show: false,
+            lineStyle: {
+              color: '#181a23'
+            }
+          },
+        }, { 
+          gridIndex: 1, splitNumber: 3, z:4,          axisLine: {
+            onZero: false
+          },
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisLabel: { 
+            color: '#c7c7c7',            inside: true, fontSize: 6.5, 
+          },
+        }, { 
+          z:4, gridIndex: 2,splitNumber: 4,          axisLine: {
+            onZero: false
+          },
+          axisTick: {            show: false          },
+          splitLine: {            show: false          },
+          axisLabel: { 
+            color: '#c7c7c7',            inside: false,             fontSize: 8,          },
+        }
+      ],
+      dataZoom: [{
+          type: 'slider',          xAxisIndex: [0, 1, 2],           start: 100,
+          end: 25,          throttle: 10,          top: '94%',
+          height: '6%',          borderColor: '#696969',          textStyle: {
+            color: '#dcdcdc'
+          },
+          handleSize: '90%', //slider
+          handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+          dataBackground: {
+            lineStyle: {
+              color: '#fff'
+            }, 
+            areaStyle: {
+              color: '#696969'
+            } 
+          }
+        },
+
+      ],
+      animation: false, //
+      backgroundColor: bgColor,
+      blendMode: 'source-over',
+      series: [{
+          name: 'Stock:<%= @tickerj.to_json.html_safe %>',
+          type: 'candlestick',
+          data: data.datas,
+          barWidth: '55%',
+          large: true,
+          largeThreshold: 100,
+          itemStyle: {
+            normal: {
+              color: upColor,              color0: downColor,              borderColor: upColor,
+              borderColor0: downColor,
+    
+              //opacity:0.8
+            }
+          },
+    
+        }, {
+          name: 'MA5',          type: 'line',          data: calculateMA(5,data),
+          smooth: true,          symbol: "none", //
+          lineStyle: {            normal: {
+              opacity: 0.8,              color: '#39afe6',              width: 1
+            }
+          },
+        },
+        {
+          name: 'MA10',          type: 'line',          data: calculateMA(10,data),
+          smooth: true,          symbol: "none",          lineStyle: { //
+            normal: {
+              opacity: 0.8,              color: '#da6ee8',              width: 1
+            }
+          }
+        },
+        {
+          name: 'MA20',
+          type: 'line',
+          data: calculateMA(20,data),
+          smooth: true,
+          symbol: "none",
+          lineStyle: {
+            opacity: 0.8,
+            width: 1,
+            color: ma20Color
+          }
+        },
+        {
+          name: 'MA30',
+          type: 'line',
+          data: calculateMA(30,data),
+          smooth: true,
+          symbol: "none",
+          lineStyle: {
+            normal: {
+              opacity: 0.8,
+              width: 1,
+              color: ma30Color
+            }
+          }
+        }, {
+          name: 'Volumn',
+          type: 'bar',
+          xAxisIndex: 1,
+          yAxisIndex: 1,
+          data: data.vols,
+          barWidth: '60%',
+          itemStyle: {
+            normal: {
+              color: function(params) {
+                var colorList;
+                if (data.datas[params.dataIndex][1] > data.datas[params.dataIndex][0]) {
+                  colorList = upColor;
+                } else {
+                  colorList = downColor;
+                }
+                return colorList;
+              },
+            }
+          }
+        }, {
+          name: 'MACD',
+          type: 'bar',
+          xAxisIndex: 2,
+          yAxisIndex: 2,
+          data: macd.macd,
+          barWidth: '40%',
+          itemStyle: {
+            normal: {
+              color: function(params) {
+                var colorList;
+                if (params.data >= 0) {
+                  colorList = upColor;
+                } else {
+                  colorList = downColor;
+                }
+                return colorList;
+              },
+            }
+          }
+        }, {
+          name: 'DIF',
+          type: 'line',
+          symbol: "none",
+          xAxisIndex: 2,
+          yAxisIndex: 2,
+          data: macd.dif,
+          lineStyle: {
+            normal: {
+              color: '#da6ee8',
+              width: 1
+            }
+          }
+        }, {
+          name: 'DEA',
+          type: 'line',
+          symbol: "none",
+          xAxisIndex: 2,
+          yAxisIndex: 2,
+          data: macd.dea,
+          lineStyle: {
+            normal: {
+              opacity: 0.8,
+              color: '#39afe6',
+              width: 1
+            }
+          }
+        }
+      ]
+    };
+    
+    
+}
+ 
+ 
+
+ 
+ 
+</script>
+<% end %>    
+      
+      
+
+      
+      
+    </main>
+   
+  </div><!-- .wrapper1 -->
+</body>
+
+
+
+
+
+<script>
+    // ?Œšˆê˜¢div
+    var layer=document.createElement("div");
+    // ?’udiv“Iid?
+    layer.id="layer";
+    // ã–ÊˆÂ?“_?Ž–Œ
+    function func(date){
+        /* 
+         * 
+         */
+        var style={
+            background:"rgb(23,139,202)",
+            position:"absolute",
+            zIndex:10,
+            width:"200px",
+            height:"80px",
+            left:"50%",
+            top:"50%",
+            marginLeft:"-100px",
+            marginTop:"-40px"
+        }
+        for(var i in style)
+            layer.style[i]=style[i];   
+   
+        // “–Q•s“žid?layer“ITŒ?
+        if(document.getElementById("layer")==null){
+            // Ýbody’†“Y‰ÁlayerTŒilayerÝã–Ê?Œš“Ij
+            document.body.appendChild(layer);
+            // ?’u?Ž¦?—e
+            layer.innerHTML=date;
+            // 
+            layer.style.textAlign="center";
+            layer.style.lineHeight="80px"; // ì—p¥??Žš‘Ìs‚—^div“¯‚CŽg‘´•ÛŽ…•½‹’†
+      
+            setTimeout("document.body.removeChild(layer)",5000)
+        }
+    }
+
+
+dd= <%= @nodataj.to_json.html_safe %>;
+if(dd==1)
+{
+	 func(' <%= @nodatan.to_json.html_safe %> No Data Available')
+}
+
+</script>
+ 
+ 
+ <script>
+  (function(){
+    var str = '';
+    var arr = {
+      0 : {name:'ROE',id:0},
+      1 : {name:'ROA',id:0},
+      2 : {name:'R_GP_NS121',id:0},
+      3 : {name:'R_OP_NS122',id:0},
+      4 : {name:'R_OP_NS123',id:0},
+      5 : {name:'R_RP_NS124',id:0},
+      6 : {name:'Current_R131',id:0},
+      7 : {name:'Acid_test_R132',id:0},
+      8 : {name:'R_owner_equity133',id:0},
+      9 : {name:'Fixed_R134',id:0},
+      10 : {name:'R_fixAsset_Lgterm135',id:0},
+      11 : {name:'Ttl_asset_tnOver141',id:0},
+      12 : {name:'Rcv_tnOver142',id:0},
+      13 : {name:'Invent_tnOver143',id:0},
+      14 : {name:'Ttl_pay_tnOver_Period144',id:0},
+      15 : {name:'R_rd_exp_sale154',id:0},
+      16 : {name:'Interest_cov_R161',id:0},
+      17 : {name:'Sale_C_TnOver_Prd162',id:0}
+       
+    };
+    
+    
+    
+    
+    
+    
+    for (let x in arr){
+      console.info(x);
+      str += `<li><label><input type="checkbox" value="${arr[x].id}" data-name="${arr[x].name}">${arr[x].name}</label></li>`;
+    }
+    $('#ratiosId').html(str);
+  })();
+ 
+  $("#ratios").click(function(){
+    $(this).attr('placeholder','');
+    var name = '';
+    $('#ratiosId input').each(function () {//循环遍历checkbox
+      var check=$(this).is(':checked');//判断是否选中
+      if(check){
+        name += $(this).attr('data-name')+',';
+        $(this).attr('name',"ratiosId");
+      }else {
+        $(this).attr('name',"");
+      }
+    });
+    $("#ratios").val(name.slice(0,-1));//去除最后的逗号
+  });
+ 
+  $("#ratiosId").mouseover(function() {
+    if (!$("#ratiosId").hasClass('hover')){//类hover在下面用来验证是否需要隐藏下拉，没有其他用途。
+      $("#ratiosId").addClass('hover');
+    }
+  }).mouseout(function(){
+    $("#ratiosId").removeClass('hover');
+  });
+ 
+  $(document).on('click',function() {
+    if (!$("#ratios").is(":focus") && !$("#ratiosId").hasClass('hover')) {//如果没有选中输入框且下拉不在hover状态。
+      var name = '';
+      $('#ratiosId input').each(function () {//遍历checkbox
+        var check = $(this).is(':checked');//判断是否选中
+        if (check) {
+          name += $(this).attr('data-name') + ',';
+          $(this).attr('name', "ratiosId");
+        } else {
+          $(this).attr('name', "");
+        }
+      });
+      $("#ratios").val(name.slice(0, -1));//去除最后的逗号
+      $("#ratiosId").addClass('hide');
+    } else {
+      $("#ratiosId").removeClass('hide');
+    }
+  });
+</script>
+ 
+ 
+
+ <script type = "text/javascript">
+     $(document).ready(function(){
+         //var aa = document.getElementById("highcharts-0").getAttribute("z-index");
+         //document.getElementById("highcharts-0").style="";
+         
+         //alert('aa');
+         
+})
+
+</script>
+
+
+
+
+
+
+
+
+</html>

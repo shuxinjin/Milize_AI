@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="height: 100%"></div>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+
+       <script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+// Schema:
+// date,AQIindex,PM2.5,PM10,CO,NO2,SO2
+var data1 = [[ 0.014, 0.009,-0.021, 0.914, 1.205]] ;
+var data1 = [[ 0.018, 0.004,-0.011, 0.918, 1.6  ]] ;
+var data2 = [[ 0.021, 0.003,-0.008, 0.921, 1.208]] ;
+var data3 = [[3.938e-03,8.585e-04,2.795e-04,9.496e-01,1.228e+00]] ;
+var data4 = [[ 0.02 , 0.01 ,-0.024, 0.92 , 1.476]] ;
+var data5 = [[0.006,0.002,0.006,0.915,0.954]] ;
+var data6 = [[0.004,0.002,0.009,0.999,1.118]] ;
+var data7 = [[ 0.014, 0.004,-0.004, 0.925, 0.873]] ;
+var data8 = [[ 7.439e-03, 1.279e-03,-5.286e-03, 9.413e-01, 1.340e+00]] ;
+var data9 = [[ 0.012, 0.006,-0.03 , 0.964, 1.481]] ;
+var data10 = [[ 0.01 , 0.006,-0.003, 0.93 , 1.593]] ;
+ 
+ var lineStyle = { normal: {  width: 1, 
+ opacity: 0.5   }}; 
+option = { 
+  backgroundColor: '#161627',   
+ title: {  
+   text: 'Ratios Radar Chart',        left: 'center',    
+    textStyle: {    
+        color: '#eee'       
+ }   
+ }, 
+   legend: { 
+       bottom: 5,   
+     data:['1812','1911','1332','5711','5706','3315','5715','9675','8835','1925','1824'], 
+  itemGap: 20, 
+  textStyle: { 
+   color: '#fff',  
+   fontSize: 14   
+   }, 
+  selectedMode: 'single'    }, 
+   radar: { 
+  indicator: [  
+  
+ {name: 'R_GP_NS121', max:1.020601661875844}, 
+{name: 'R_OP_NS122', max:1.0095392083749175}, 
+{name: 'R_OP_NS123', max:1.0085870176553726}, 
+{name: 'R_RP_NS124', max:1.9989272356033325}, 
+{ name: 'Current_R131', max:2.6001616716384888} 
+,
+
+        ],
+        shape: 'circle',
+        splitNumber: 5,
+        name: {
+            textStyle: {
+                color: 'rgb(238, 197, 102)'
+            }
+        },
+        splitLine: {
+            lineStyle: {
+                color: [
+                    'rgba(238, 197, 102, 0.1)', 'rgba(238, 197, 102, 0.2)',
+                    'rgba(238, 197, 102, 0.4)', 'rgba(238, 197, 102, 0.6)',
+                    'rgba(238, 197, 102, 0.8)', 'rgba(238, 197, 102, 1)'
+                ].reverse()
+            }
+        },
+        splitArea: {
+            show: false
+        },
+        axisLine: {
+            lineStyle: {
+                color: 'rgba(238, 197, 102, 0.5)'
+            }
+        }
+    },
+    series: [
+        
+ 
+ { name: '1812', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data1, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '1911', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data2, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '1332', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data3, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '5711', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data4, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '5706', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data5, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '3315', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data6, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '5715', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data7, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '9675', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data8, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '8835', 
+  type: 'radar', 
+  lineStyle: lineStyle, 
+ data: data9, 
+ symbol: 'none', 
+  itemStyle: { 
+  normal: { 
+ color: '#F9713C'  } }, 
+ areaStyle: { 
+    normal: {  opacity: 0.1   }  
+   }  
+  }, 
+ 
+ 
+ { name: '1925',   type: 'radar',  
+  lineStyle: lineStyle, 
+ data: data10, 
+ symbol: 'none', 
+ itemStyle: {  
+  normal: { 
+ color: '#F9713C' 
+ } 
+ }, 
+ areaStyle: { 
+   normal: {  opacity: 0.1   }  
+   }  
+  } 
+
+       ]   
+  };  
+ if (option && typeof option === "object") 
+ { myChart.setOption(option, true);    
+   }  
+  </script> 
+ </body> 
+  </html>
